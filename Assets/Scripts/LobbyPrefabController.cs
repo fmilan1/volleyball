@@ -11,7 +11,7 @@ public class LobbyPrefabController : MonoBehaviour
     public TMPro.TMP_Text lobbyName;
     public TMPro.TMP_Text maxPlayers;
 
-    public string code;
+    public string relayCode;
     public string id;
 
     void Start()
@@ -20,7 +20,7 @@ public class LobbyPrefabController : MonoBehaviour
         relayManager = GameObject.Find("RelayManager").GetComponent<RelayManager>();
         GetComponent<Button>().onClick.AddListener(delegate
         {
-            relayManager.JoinRelay(code);
+            relayManager.JoinRelayAndLobby(relayCode, id);
         });
     }
 }

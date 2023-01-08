@@ -12,9 +12,6 @@ public class PlayerController : NetworkBehaviour
 
     Camera cam;
 
-    bool canShoot = true;
-
-
     [SerializeField] GameObject shootPoint;
 
     GameObject ball;
@@ -46,10 +43,23 @@ public class PlayerController : NetworkBehaviour
         }
     }
 
+    public void LeaveGame()
+    {
+        GameObject.Find("LobbyMenu").transform.GetChild(0).gameObject.SetActive(true);
+    }
+
+    public override void OnDestroy()
+    {
+        if (!IsOwner) return;
+        GameObject.Find("LobbyMenu").transform.GetChild(0).gameObject.SetActive(true);        
+    }
+
     void Update()
     {
         
         if (!IsOwner) return;
+
+        
 
         ball.GetComponent<Rigidbody>().isKinematic = false;
 
