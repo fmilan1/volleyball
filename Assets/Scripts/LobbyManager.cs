@@ -117,7 +117,6 @@ public class LobbyManager : MonoBehaviour
         }
         foreach (Lobby lobby in queryResponse.Results)
         {
-            Debug.Log(lobby.AvailableSlots);
             GameObject prefab = Instantiate(LobbyPrefab, LobbyListContent);
             var controller = prefab.GetComponent<LobbyPrefabController>();
             controller.lobbyName.text = lobby.Name;
