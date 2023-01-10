@@ -9,7 +9,7 @@ using UnityEngine.UI;
 public class PlayerController : NetworkBehaviour
 {
 
-    [SerializeField] float sensitivity;
+    [SerializeField] float speed;
 
     [SerializeField] Animator anim;
 
@@ -24,6 +24,9 @@ public class PlayerController : NetworkBehaviour
     public TMPro.TMP_Text nameText;
 
     Spawner spawner;
+
+    Vector3 WASD;
+    Rigidbody rb;
 
     void Start()
     {
@@ -46,6 +49,7 @@ public class PlayerController : NetworkBehaviour
         {
             Destroy(overHeadCanvas.transform.GetChild(1).gameObject);
         }
+        rb = GetComponent<Rigidbody>();
 
         if (IsOwner)
         {
@@ -95,6 +99,8 @@ public class PlayerController : NetworkBehaviour
         LeaveGame();
     }
 
+
+    
     void Update()
     {
         
@@ -105,12 +111,10 @@ public class PlayerController : NetworkBehaviour
 
         // ball.GetComponent<Rigidbody>().isKinematic = false;
 
-        Vector3 WASD = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+        
+        WASD = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         WASD.Normalize();
-        Vector3 move = WASD;
 
-
-        transform.Translate(move * Time.deltaTime * 10, Space.World);
         if (WASD != Vector3.zero)
         {
             Quaternion toRotation = Quaternion.LookRotation(WASD, Vector3.up);
@@ -158,9 +162,10 @@ public class PlayerController : NetworkBehaviour
         {
             Shoot(angle);
         }
+    }
 
-        
-
+    private void FixedUpdate() {
+        rb.AddForce(WASD * speed, ForceMode.Acceleration);
     }
 
     void Shoot(int angle)
@@ -176,7 +181,6 @@ public class PlayerController : NetworkBehaviour
     {
         overHeadCanvas.transform.LookAt(overHeadCanvas.transform.position + cam.transform.forward);
     }
-
     
      
 }
