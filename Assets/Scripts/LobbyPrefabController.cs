@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using Unity.Services.Lobbies.Models;
 
 public class LobbyPrefabController : MonoBehaviour
 {
@@ -10,9 +11,7 @@ public class LobbyPrefabController : MonoBehaviour
     [SerializeField] RelayManager relayManager;
     public TMPro.TMP_Text lobbyName;
     public TMPro.TMP_Text maxPlayers;
-
-    public string relayCode;
-    public string id;
+    public Lobby lobby;
 
     void Start()
     {
@@ -20,7 +19,7 @@ public class LobbyPrefabController : MonoBehaviour
         relayManager = GameObject.Find("RelayManager").GetComponent<RelayManager>();
         GetComponent<Button>().onClick.AddListener(delegate
         {
-            relayManager.JoinRelayAndLobby(relayCode, id);
+            lobbyManager.JoinLobby(lobby);
         });
     }
 }

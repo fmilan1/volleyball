@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerController : NetworkBehaviour
 {
@@ -18,15 +21,19 @@ public class PlayerController : NetworkBehaviour
 
     Spawner spawner;
 
-    Canvas canvas;
+    [SerializeField] Canvas overHeadCanvas;
+
+    public TMPro.TMP_Text nameText;
+
+
 
     void Start()
     {
+        
         cam = Camera.main;
-        canvas = GetComponentInChildren<Canvas>();
 
         spawner = GameObject.Find("Spawner").GetComponent<Spawner>();
-
+        
         if (IsHost && IsOwner)
         {
             ball = spawner.SpawnBallServerRpc();
@@ -38,9 +45,44 @@ public class PlayerController : NetworkBehaviour
 
         if (!IsOwner)
         {
-            Destroy(GetComponentInChildren<Canvas>().gameObject);
-            Destroy(transform.GetChild(4).gameObject);
+            Destroy(overHeadCanvas.transform.GetChild(0).gameObject);
         }
+        else Destroy(overHeadCanvas.transform.GetChild(1).gameObject);
+
+        if (IsOwner)
+        {
+            string playerName = PlayerPrefs.GetString("playerName");
+            GetComponent<PlayerController>().nameText.text = playerName;
+            gameObject.name = playerName;
+            UpdateNameServerRpc(gameObject, playerName);
+            GameObject.Find("LobbyMenu").transform.GetChild(0).gameObject.SetActive(false);
+        }
+        UpdateHostNameServerRpc();
+    }
+
+
+
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdateNameServerRpc(NetworkObjectReference networkObjectReference, string nameStr)
+    {
+        GameObject g = (GameObject)networkObjectReference;
+        g.name = nameStr;
+        g.GetComponent<PlayerController>().nameText.text = nameStr;
+        UpdateNameClientRpc(networkObjectReference, nameStr);        
+    }
+
+    [ClientRpc]
+    void UpdateNameClientRpc(NetworkObjectReference networkObjectReference, string nameStr)
+    {
+        GameObject g = (GameObject)networkObjectReference;
+        g.name = nameStr;
+        g.GetComponent<PlayerController>().nameText.text = nameStr;
+    }
+
+    [ServerRpc(RequireOwnership = false)]
+    public void UpdateHostNameServerRpc()
+    {
+        UpdateNameClientRpc(gameObject, gameObject.name);
     }
 
     public void LeaveGame()
@@ -59,6 +101,7 @@ public class PlayerController : NetworkBehaviour
         
         if (!IsOwner) return;
 
+        
         
 
         ball.GetComponent<Rigidbody>().isKinematic = false;
@@ -139,8 +182,7 @@ public class PlayerController : NetworkBehaviour
 
     void LateUpdate()
     {
-        if (!IsOwner) return;
-        canvas.transform.LookAt(transform.position + cam.transform.forward);
+        overHeadCanvas.transform.LookAt(overHeadCanvas.transform.position + cam.transform.forward);
     }
 
     

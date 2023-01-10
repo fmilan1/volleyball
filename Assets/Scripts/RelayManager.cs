@@ -9,6 +9,7 @@ using Unity.Netcode;
 using Unity.Netcode.Transports.UTP;
 using Unity.Networking.Transport.Relay;
 using Unity.Services.Lobbies;
+using Unity.Services.Lobbies.Models;
 
 public class RelayManager : MonoBehaviour
 {
@@ -52,11 +53,10 @@ public class RelayManager : MonoBehaviour
         }
     }
 
-    public async void JoinRelayAndLobby(string joinCode, string id)
+    public async void JoinRelay(string joinCode)
     {
         try
         {
-            // await LobbyService.Instance.JoinLobbyByIdAsync(id);
             JoinAllocation allocation = await RelayService.Instance.JoinAllocationAsync(joinCode);
             RelayServerData relayServerData = new RelayServerData(allocation, "dtls");
 
@@ -64,7 +64,7 @@ public class RelayManager : MonoBehaviour
 
             NetworkManager.Singleton.StartClient();
             Debug.Log("Joined with code " + joinCode);
-            GameObject.Find("LobbyMenu").transform.GetChild(0).gameObject.SetActive(false);
+            // GameObject.Find("LobbyMenu").transform.GetChild(0).gameObject.SetActive(false);            
         }
         catch (RelayServiceException e)
         {
