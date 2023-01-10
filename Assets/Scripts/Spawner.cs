@@ -5,13 +5,14 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
-    [SerializeField] GameObject ball;
+
+    [SerializeField] GameObject ballPrefab;
+
 
     [ServerRpc]
-    public GameObject SpawnBallServerRpc()
+    public void SpawnBallServerRpc()
     {
-        GameObject g = Instantiate(ball, Vector3.zero, Quaternion.identity);
+        GameObject g = Instantiate(ballPrefab, new Vector3(0, 1, 0), Quaternion.identity);
         g.GetComponent<NetworkObject>().Spawn();
-        return g;
     }
 }

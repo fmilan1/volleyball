@@ -23,14 +23,9 @@ public class BallController : NetworkBehaviour
 
     void Start()
     {
-        StartServerRpc();
-    }
-
-    [ServerRpc(RequireOwnership = false)]
-    void StartServerRpc()
-    {
+        if (!IsHost) return;
         target = Instantiate(targetPrefab);
-        target.GetComponent<NetworkObject>().Spawn(true);
+        target.GetComponent<NetworkObject>().Spawn();
     }
 
     void Update()

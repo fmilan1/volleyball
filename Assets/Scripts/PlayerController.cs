@@ -19,13 +19,11 @@ public class PlayerController : NetworkBehaviour
 
     GameObject ball;
 
-    Spawner spawner;
-
     [SerializeField] Canvas overHeadCanvas;
 
     public TMPro.TMP_Text nameText;
 
-
+    Spawner spawner;
 
     void Start()
     {
@@ -34,23 +32,24 @@ public class PlayerController : NetworkBehaviour
 
         spawner = GameObject.Find("Spawner").GetComponent<Spawner>();
         
-        if (IsHost && IsOwner)
+        if (IsHost && IsOwnedByServer)
         {
-            ball = spawner.SpawnBallServerRpc();
-        }        
-        else if (IsClient && IsOwner)
-        {
-            ball = GameObject.Find("volleyball(Clone)");
+            spawner.SpawnBallServerRpc();
         }
 
         if (!IsOwner)
         {
             Destroy(overHeadCanvas.transform.GetChild(0).gameObject);
+            Destroy(shootPoint);
         }
-        else Destroy(overHeadCanvas.transform.GetChild(1).gameObject);
+        else 
+        {
+            Destroy(overHeadCanvas.transform.GetChild(1).gameObject);
+        }
 
         if (IsOwner)
         {
+            ball = GameObject.Find("volleyball(Clone)");
             string playerName = PlayerPrefs.GetString("playerName");
             GetComponent<PlayerController>().nameText.text = playerName;
             gameObject.name = playerName;
@@ -93,7 +92,7 @@ public class PlayerController : NetworkBehaviour
     public override void OnDestroy()
     {
         if (!IsOwner) return;
-        GameObject.Find("LobbyMenu").transform.GetChild(0).gameObject.SetActive(true);        
+        LeaveGame();
     }
 
     void Update()
@@ -104,7 +103,7 @@ public class PlayerController : NetworkBehaviour
         
         
 
-        ball.GetComponent<Rigidbody>().isKinematic = false;
+        // ball.GetComponent<Rigidbody>().isKinematic = false;
 
         Vector3 WASD = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
         WASD.Normalize();
@@ -159,13 +158,6 @@ public class PlayerController : NetworkBehaviour
         {
             Shoot(angle);
         }
-        // else if (Input.GetMouseButton(0))
-
-
-        if (Input.GetMouseButtonDown(0) && Input.GetMouseButtonDown(1))
-        {
-            Debug.Log("same time");
-        }
 
         
 
@@ -173,7 +165,7 @@ public class PlayerController : NetworkBehaviour
 
     void Shoot(int angle)
     {
-        if (Vector3.Distance(ball.transform.position, transform.position) <= 3.5f)
+        if (Vector3.Distance(ball.transform.position, transform.position) <= 2f)
         {
             ball.GetComponent<BallController>().ShootServerRpc(shootPoint.transform.position.x, shootPoint.transform.position.z, angle);
         }  
